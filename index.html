@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFU Training App · Mi Plan de Entrenamiento</title>
+<meta name="theme-color" content="#0072FB">
+<link rel="icon" type="image/png" href="https://nutricionfitust.github.io/NUTRICIONFITUST-APP/images/NFU_LOGO_cua_192.png">
+<link rel="apple-touch-icon" href="https://nutricionfitust.github.io/NUTRICIONFITUST-APP/images/NFU_LOGO_cua_192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NFU Training App">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ====== VARIABLES ====== */
+:root{
+  --blue:#0072FB;--blue-50:#eff6ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;--blue-700:#1d4ed8;--blue-800:#1e40af;--blue-900:#1e3a5f;
+  --green-bg:#ecfdf5;--green-border:#34d399;--green-txt:#065f46;--green-bar:#d1fae5;
+  --red-bg:rgba(254,202,202,.6);--red-border:#f87171;--red-txt:#7f1d1d;--red-bar:rgba(254,202,202,.9);
+  --yellow-bg:#fef9c3;--yellow-border:#eab308;--yellow-txt:#854d0e;--yellow-bar:#fef9c3;
+  --purple-bg:linear-gradient(145deg,#f6f3ff,#efeaff);--purple-border:rgba(139,92,246,.25);--purple-txt:#6d28d9;
+  --rest-bg:#ede9fe;--rest-border:#c4b5fd;--rest-txt:#4338ca;
+  --radius:14px;--shadow:0 10px 24px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(135deg,#87CEEB 0%,#4169E1 100%);min-height:100vh;color:#1e293b}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--blue)}
+
+/* ====== HEADER ====== */
+.header{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);padding:16px 20px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.header h1{font-size:1.6rem;font-weight:800;color:var(--blue-800)}
+.header h1 a{color:inherit;text-decoration:none}
+.header h1 a:hover{color:var(--blue)}
+.header h2{font-size:1rem;font-weight:600;color:var(--blue-700);margin-top:2px}
+.header p{font-size:.85rem;color:#3b82f6;margin-top:6px;max-width:600px;margin-left:auto;margin-right:auto}
+
+/* ====== MAIN CONTAINER ====== */
+.main{max-width:900px;margin:24px auto;padding:0 16px 60px}
+.card{background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.08);padding:28px;animation:fadeUp .4s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ====== LOGIN ====== */
+.login-card{max-width:440px;margin:0 auto;text-align:center}
+.login-icon{width:64px;height:64px;margin:0 auto 16px;color:var(--blue)}
+.login-card h3{font-size:1.25rem;font-weight:800;color:var(--blue-800);margin-bottom:6px}
+.login-card .sub{font-size:.85rem;color:#64748b;margin-bottom:20px}
+.pass-input{width:100%;border:2px solid var(--blue-200);border-radius:12px;padding:14px 16px;font-size:1rem;text-align:center;transition:border-color .2s ease}
+.pass-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,114,251,.12)}
+.login-btn{width:100%;background:var(--blue);color:#fff;border:none;padding:14px;border-radius:12px;font-size:1rem;font-weight:700;margin-top:14px;transition:filter .15s ease,transform .1s ease}
+.login-btn:hover{filter:brightness(1.06)}
+.login-btn:active{transform:scale(.98)}
+.login-err{color:#dc2626;font-size:.85rem;margin-top:10px;min-height:20px}
+.wa-btn{display:inline-block;background:linear-gradient(to left,#22c55e,#15803d);color:#fff;padding:14px 28px;border-radius:14px;font-weight:700;font-size:.95rem;text-decoration:none;margin-top:20px;box-shadow:0 4px 16px rgba(0,0,0,.1);transition:transform .15s ease}
+.wa-btn:hover{transform:translateY(-2px)}
+
+/* ====== ROUTINE VIEW ====== */
+.routine-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.routine-header h3{font-size:1.2rem;font-weight:800;color:var(--blue-800)}
+.routine-header .meta{font-size:.8rem;color:#64748b}
+.routine-actions{display:flex;gap:8px;align-items:center}
+.routine-actions button,.routine-actions a{background:transparent;border:1px solid var(--blue-200);color:var(--blue-700);padding:8px 14px;border-radius:10px;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .2s ease}
+.routine-actions button:hover,.routine-actions a:hover{background:var(--blue-50);border-color:var(--blue)}
+
+/* ====== DAY CARDS ====== */
+.day{border:1px solid #e2e8f0;border-radius:var(--radius);margin-bottom:12px;overflow:hidden;animation:fadeUp .3s ease-out}
+.day-header{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,var(--blue-50),var(--blue-100));cursor:pointer;transition:background .2s ease;user-select:none}
+.day-header:hover{background:var(--blue-100)}
+.day-header:active{transform:scale(.998)}
+.day-header .arrow{transition:transform .3s ease;color:var(--blue-700);font-size:1.1rem;flex:none}
+.day-header.open .arrow{transform:rotate(90deg)}
+.day-header h4{flex:1;font-size:.95rem;font-weight:700;color:var(--blue-800)}
+.day-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.22,.61,.36,1)}
+.day-body.open{max-height:none;overflow:visible}
+.day-body-inner{padding:12px 16px 16px}
+
+/* ====== SECTIONS (color bars) ====== */
+.section{position:relative;padding-left:18px;margin-top:14px}
+.section::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:999px}
+.section.green::before{background:var(--green-bar);border:1px solid var(--green-border)}
+.section.red::before{background:var(--red-bar);border:1px solid var(--red-border)}
+.section.yellow::before{background:var(--yellow-bar);border:1px solid var(--yellow-border)}
+.sec-header{border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.sec-header.green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green-txt)}
+.sec-header.red{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red-txt)}
+.sec-header.yellow{background:var(--yellow-bg);border:1px solid var(--yellow-border);color:var(--yellow-txt)}
+
+/* ====== EXERCISE CARDS ====== */
+.ex-card{background:linear-gradient(135deg,var(--blue-50),var(--blue-100));border:1px solid var(--blue-200);border-radius:10px;padding:10px 12px;margin-bottom:8px;transition:all .15s ease;cursor:pointer}
+.ex-card:hover{background:linear-gradient(135deg,var(--blue-100),var(--blue-200))}
+.ex-card:active{transform:scale(.995)}
+.ex-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.ex-name{font-size:.88rem;font-weight:600;color:var(--blue-900)}
+.ex-pills{display:flex;gap:4px;flex-wrap:wrap}
+.pill-series,.pill-reps{display:inline-block;font-size:.7rem;background:var(--blue-50);color:var(--blue-800);padding:3px 8px;border-radius:6px;border:1px solid var(--blue-100)}
+.ex-nota{font-size:.75rem;color:#475569;font-style:italic;margin-top:4px}
+.badge-rest{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:999px;color:var(--rest-txt);background:var(--rest-bg);border:1px solid var(--rest-border);white-space:nowrap}
+
+/* ====== DESCRIPTION (collapsible) ====== */
+.desc-box{background:#fff;border:1px solid #dbeafe;border-radius:8px;padding:6px 10px;margin-top:6px;cursor:pointer}
+.dots-btn{display:inline-flex;gap:3px;padding:4px 6px;border-radius:6px;border:none;background:transparent;transition:background .15s ease}
+.dots-btn:hover{background:#f1f5f9}
+.dot{width:4px;height:4px;border-radius:999px;background:#94a3b8}
+.desc-panel{display:grid;grid-template-rows:0fr;overflow:hidden;transition:grid-template-rows .25s ease}
+.desc-panel.open{grid-template-rows:1fr}
+.desc-panel>div{min-height:0}
+.desc-text{font-size:.78rem;color:#475569;line-height:1.5;padding-top:6px}
+
+/* ====== SUPERSET CARD ====== */
+.superset{border-radius:var(--radius);background:var(--purple-bg);border:1px solid var(--purple-border);box-shadow:var(--shadow);padding:12px;margin-bottom:8px;transition:transform .2s ease}
+.superset:hover{transform:translateY(-2px)}
+.superset-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px}
+.superset-label{font-size:.85rem;font-weight:700;color:var(--purple-txt)}
+.superset-sub{font-size:.72rem;color:#7c3aed}
+
+/* ====== HIIT INFO ====== */
+.hiit-info{background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.82rem;color:var(--yellow-txt);line-height:1.5}
+.hiit-info strong{display:block;margin-bottom:4px}
+
+/* ====== MODAL (video) ====== */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:100;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:background .25s ease}
+.modal-bg.open{background:rgba(0,0,0,.7);pointer-events:auto}
+.modal-box{background:#000;border-radius:14px;overflow:hidden;width:min(92vw,800px);box-shadow:0 20px 60px rgba(0,0,0,.4);transform:scale(.92);opacity:0;transition:transform .3s cubic-bezier(.22,.61,.36,1),opacity .25s ease}
+.modal-bg.open .modal-box{transform:scale(1);opacity:1}
+.modal-top{display:flex;justify-content:flex-end;padding:6px 10px;background:#111}
+.modal-top button{background:transparent;border:none;color:rgba(255,255,255,.7);font-size:1.1rem;padding:4px 8px}
+.modal-top button:hover{color:#fff}
+.modal-frame{width:100%;aspect-ratio:16/9;border:none;display:block}
+
+/* ====== PRINT ====== */
+@media print{
+  body{background:#fff!important}
+  .header,.login-card,.routine-actions,.wa-btn,.desc-box,.no-print{display:none!important}
+  .card{box-shadow:none;padding:0}
+  .day-body{max-height:none!important;overflow:visible!important}
+  .day-header .arrow{display:none}
+  .superset{box-shadow:none}
+}
+
+/* ====== MOBILE ====== */
+@media(max-width:640px){
+  .header h1{font-size:1.3rem}
+  .ex-top{flex-direction:column;align-items:flex-start}
+  .routine-header{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1><a href="https://www.instagram.com/nutricionfitust/" target="_blank" rel="noopener">NUTRICIONFITUST</a></h1>
+  <h2>Entrenamientos Personalizados</h2>
+  <p>Mi misión es ayudarte a alcanzar tus objetivos y mejorar tu físico a través de una rutina a medida y asesoramiento continuo!</p>
+</div>
+
+<div class="main">
+
+  <!-- LOGIN -->
+  <div class="card login-card" id="loginCard">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+    </div>
+    <h3>MI PLAN DE ENTRENAMIENTO</h3>
+    <p class="sub">Ingresá tu contraseña para acceder a tu rutina personalizada</p>
+    <input type="password" id="passInput" class="pass-input" placeholder="Tu contraseña">
+    <button class="login-btn" id="loginBtn">Acceder</button>
+    <div class="login-err" id="loginErr"></div>
+    <a class="wa-btn" href="https://wa.me/message/WP44MHI4JKZRK1" target="_blank" rel="noopener">SOLICITAR MI PLAN</a>
+  </div>
+
+  <!-- ROUTINE -->
+  <div class="card" id="routineCard" style="display:none">
+    <div class="routine-header">
+      <div>
+        <h3 id="routineTitle"></h3>
+        <div class="meta" id="routineMeta"></div>
+      </div>
+      <div class="routine-actions">
+        <button onclick="window.print()" title="Imprimir / PDF">🖨️ PDF</button>
+        <button id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </div>
+    <div id="routineBody"></div>
+  </div>
+
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="modal-bg" id="videoModal">
+  <div class="modal-box">
+    <div class="modal-top"><button id="videoClose">✕</button></div>
+    <iframe class="modal-frame" id="videoFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ============================================================
+   NFU Training App · Vista del alumno
+   Configuración: reemplazá estos valores con los de tu proyecto
+   (Supabase → Project Settings → API)
+   ============================================================ */
+const SUPABASE_URL = 'https://rrcfwlqflheeljylggse.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_gLaYMq53a13FOVlKNZ5J4Q_z9_qrTR5';
+
+/* Si no están configurados, pedir al usuario (fallback para desarrollo) */
+let sb;
+function initSupabase(){
+  let url=SUPABASE_URL, key=SUPABASE_KEY;
+  if(url.includes('%%')){
+    url=localStorage.getItem('nfu_url')||prompt('Supabase URL:');
+    key=localStorage.getItem('nfu_key')||prompt('Supabase anon key:');
+    if(url&&key){localStorage.setItem('nfu_url',url);localStorage.setItem('nfu_key',key);}
+  }
+  if(!url||!key){document.getElementById('loginErr').textContent='Supabase no configurado.';return false;}
+  sb=supabase.createClient(url,key);
+  return true;
+}
+
+let EJERCICIOS_DB = {}; // {nombre: {descripcion, video_url}}
+
+/* ---------- LOGIN ---------- */
+document.getElementById('loginBtn').onclick=login;
+document.getElementById('passInput').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+
+async function login(){
+  if(!sb&&!initSupabase()) return;
+  const pass=document.getElementById('passInput').value.trim();
+  const err=document.getElementById('loginErr');
+  if(!pass){err.textContent='Escribí tu contraseña.';return;}
+  err.textContent='Ingresando…';
+  try{
+    const {data,error}=await sb.rpc('get_rutina_por_password',{p_password:pass});
+    if(error) throw error;
+    if(!data||!data.length){err.textContent='Contraseña incorrecta. Verificá e intentá de nuevo.';return;}
+    // cargar catálogo de ejercicios para descripciones
+    await loadEjerciciosDB();
+    showRoutine(data[0]);
+  }catch(e){
+    err.textContent='Error de conexión: '+e.message;
+  }
+}
+
+async function loadEjerciciosDB(){
+  if(!sb) return;
+  const {data}=await sb.from('ejercicios').select('nombre,descripcion,video_url');
+  if(data) data.forEach(e=>EJERCICIOS_DB[e.nombre]={descripcion:e.descripcion||'',video_url:e.video_url||''});
+}
+
+document.getElementById('logoutBtn').onclick=()=>{
+  document.getElementById('routineCard').style.display='none';
+  document.getElementById('loginCard').style.display='';
+  document.getElementById('passInput').value='';
+  document.getElementById('loginErr').textContent='';
+};
+
+/* ---------- SHOW ROUTINE ---------- */
+function showRoutine(r){
+  document.getElementById('loginCard').style.display='none';
+  const rc=document.getElementById('routineCard');
+  rc.style.display='';
+  document.getElementById('routineTitle').textContent=r.rutina_nombre||'Mi Plan de Entrenamiento';
+  document.getElementById('routineMeta').textContent=`${r.alumno_nombre||''} · ${r.carpeta||''}`;
+  const plan=r.plan||{dias:[]};
+  const body=document.getElementById('routineBody');
+  body.innerHTML='';
+  (plan.dias||[]).forEach((dia,di)=>{
+    const dayEl=document.createElement('div');dayEl.className='day';
+    dayEl.innerHTML=`<div class="day-header" data-day="${di}">
+      <span class="arrow">▶</span>
+      <h4>${esc(dia.nombre||'Día '+(di+1))}</h4>
+    </div>
+    <div class="day-body" id="dayBody${di}"><div class="day-body-inner">${renderDia(dia)}</div></div>`;
+    body.appendChild(dayEl);
+  });
+  // first day open
+  const first=body.querySelector('.day-header');
+  if(first) toggleDay(first);
+  // wire day toggles
+  body.querySelectorAll('.day-header').forEach(h=>h.onclick=()=>toggleDay(h));
+  // wire descriptions
+  body.querySelectorAll('.desc-box').forEach(el=>el.onclick=()=>{
+    const panel=el.querySelector('.desc-panel');
+    panel.classList.toggle('open');
+  });
+  // wire videos
+  body.querySelectorAll('[data-video]').forEach(el=>el.onclick=e=>{
+    e.stopPropagation();
+    openVideo(el.dataset.video);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleDay(header){
+  const isOpen=header.classList.contains('open');
+  // close all
+  document.querySelectorAll('.day-header').forEach(h=>{h.classList.remove('open');});
+  document.querySelectorAll('.day-body').forEach(b=>{b.classList.remove('open');b.style.maxHeight='0';});
+  if(!isOpen){
+    header.classList.add('open');
+    const body=header.nextElementSibling;
+    body.classList.add('open');
+    body.style.maxHeight=body.scrollHeight+'px';
+    // re-measure after images/content load
+    setTimeout(()=>{if(body.classList.contains('open'))body.style.maxHeight=body.scrollHeight+'px';},400);
+  }
+}
+
+function renderDia(dia){
+  return (dia.secciones||[]).map(sec=>renderSeccion(sec)).join('');
+}
+
+function renderSeccion(sec){
+  let color='green';
+  if(/fuerza/i.test(sec.nombre)) color='red';
+  if(/hiit/i.test(sec.nombre)) color='yellow';
+  let html=`<div class="section ${color}">
+    <div class="sec-header ${color}">${esc(sec.nombre)}</div>`;
+  (sec.items||[]).forEach(item=>{
+    if(item.tipo==='superset'&&item.ejercicios.length>1){
+      html+=renderSuperset(item);
+    }else{
+      (item.ejercicios||[]).forEach(ex=>{
+        html+=renderExercise(ex,item.descanso);
+      });
+    }
+  });
+  if(/hiit/i.test(sec.nombre)&&sec.infoHIIT){
+    html+=`<div class="hiit-info"><strong>Más información de HIIT</strong>${esc(sec.infoHIIT)}</div>`;
+  }
+  html+='</div>';
+  return html;
+}
+
+function renderSuperset(item){
+  const n=item.ejercicios.length;
+  const label=n===2?'Biserie':n===3?'Triserie':n>3?'Multiserie':'Serie compuesta';
+  let inner=item.ejercicios.map(ex=>renderExercise(ex,null,true)).join('');
+  let rest='';
+  if(item.descanso){
+    let r=item.descanso.trim();
+    if(!/^descanso/i.test(r)) r='Descanso '+r;
+    rest=`<div style="text-align:right;margin-top:8px"><span class="badge-rest">${esc(r)}</span></div>`;
+  }
+  return `<div class="superset">
+    <div class="superset-head">
+      <div class="superset-label">${label}</div>
+      <div class="superset-sub">Sin descanso entre ejercicios</div>
+    </div>
+    ${inner}${rest}
+  </div>`;
+}
+
+function renderExercise(ex,descanso,inSuperset){
+  const db=EJERCICIOS_DB[ex.nombre]||{};
+  const videoUrl=db.video_url||'';
+  const desc=db.descripcion||'';
+  const repsFormatted=formatReps(ex.reps);
+  const uid='d'+Math.random().toString(36).slice(2,8);
+  let restHtml='';
+  if(descanso&&!inSuperset){
+    let r=descanso.trim();
+    if(!/^descanso/i.test(r)) r='Descanso '+r;
+    restHtml=`<span class="badge-rest">${esc(r)}</span>`;
+  }
+  const videoBtn=videoUrl?`<button data-video="${escAttr(videoUrl)}" style="background:transparent;border:none;font-size:1rem;cursor:pointer;flex:none" title="Ver video">🎬</button>`:'';
+  return `<div class="ex-card">
+    <div class="ex-top">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+        ${videoBtn}
+        <span class="ex-name">${esc(ex.nombre)}</span>
+      </div>
+      <div class="ex-pills">
+        ${ex.series?`<span class="pill-series">Series: ${esc(ex.series)}</span>`:''}
+        ${repsFormatted?`<span class="pill-reps">Reps: ${repsFormatted}</span>`:''}
+        ${restHtml}
+      </div>
+    </div>
+    ${ex.nota?`<div class="ex-nota">📝 ${esc(ex.nota)}</div>`:''}
+    ${desc?`<div class="desc-box">
+      <button class="dots-btn" type="button"><span class="dot"></span><span class="dot"></span><span class="dot"></span></button>
+      <div class="desc-panel"><div><div class="desc-text">${esc(desc)}</div></div></div>
+    </div>`:''}
+  </div>`;
+}
+
+/* format reps: "12 10 8" → "12• 10• 8", preserves (10+8) and ↑↓ */
+function formatReps(reps){
+  if(!reps) return '';
+  const r=reps.trim();
+  return esc(r).replace(/(\S+)\s+/g,'$1• ');
+}
+
+/* ---------- VIDEO MODAL ---------- */
+function openVideo(url){
+  const m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const src=m?'https://drive.google.com/file/d/'+m[1]+'/preview':url;
+  document.getElementById('videoFrame').src=src;
+  requestAnimationFrame(()=>document.getElementById('videoModal').classList.add('open'));
+}
+function closeVideo(){
+  document.getElementById('videoModal').classList.remove('open');
+  setTimeout(()=>document.getElementById('videoFrame').src='',300);
+}
+document.getElementById('videoClose').onclick=closeVideo;
+document.getElementById('videoModal').onclick=e=>{if(e.target.id==='videoModal')closeVideo();};
+
+/* ---------- HELPERS ---------- */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+/* ---------- AUTO INIT ---------- */
+initSupabase();
+</script>
+</body>
+</html>
