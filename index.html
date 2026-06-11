@@ -35,6 +35,10 @@ a{color:var(--blue)}
 .main{max-width:900px;margin:24px auto;padding:0 16px 60px}
 .card{background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.08);padding:28px;animation:fadeUp .4s ease-out}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.view-enter{animation:fadeIn .3s cubic-bezier(.22,.61,.36,1) forwards}
+.view-exit{animation:fadeOut .2s ease-in forwards;pointer-events:none}
 
 .login-card{max-width:440px;margin:0 auto;text-align:center}
 .login-icon{width:80px;height:80px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,var(--blue-50),var(--blue-100));display:flex;align-items:center;justify-content:center;color:var(--blue);border:2px solid var(--blue-200)}
@@ -119,7 +123,8 @@ a{color:var(--blue)}
 .info-folder{border-radius:var(--radius);background:var(--purple-bg);border:1px solid var(--purple-border);box-shadow:0 10px 24px rgba(0,0,0,.06);margin-top:12px;overflow:hidden}
 .info-folder-header{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .2s ease;user-select:none}
 .info-folder-header:hover{background:rgba(139,92,246,.08)}
-.info-folder-header .arrow{transition:transform .3s ease;color:var(--purple-txt);font-size:1rem}
+.info-folder-header:active{transform:scale(.995)}
+.info-folder-header .arrow{transition:transform .35s cubic-bezier(.22,.61,.36,1);color:var(--purple-txt);font-size:1rem}
 .info-folder-header.open .arrow{transform:rotate(90deg)}
 .info-folder-header h4{font-size:.95rem;font-weight:700;color:var(--purple-txt)}
 .info-folder-header p{font-size:.75rem;color:#7c3aed;margin-top:2px}
@@ -268,11 +273,20 @@ function showRoutine(r){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function showFolders(){
-  document.getElementById('foldersView').style.display='';
-  document.getElementById('dayView').style.display='none';
-  const plan=PLAN_DATA.plan||{dias:[]};
+function showFolders(animate){
   const fv=document.getElementById('foldersView');
+  const dv=document.getElementById('dayView');
+  if(animate){
+    dv.classList.add('view-exit');
+    setTimeout(()=>{
+      dv.style.display='none';dv.classList.remove('view-exit');
+      fv.style.display='';fv.classList.add('view-enter');
+      setTimeout(()=>fv.classList.remove('view-enter'),350);
+    },200);
+  }else{
+    dv.style.display='none';fv.style.display='';
+  }
+  const plan=PLAN_DATA.plan||{dias:[]};
   fv.innerHTML='';
   (plan.dias||[]).forEach((dia,di)=>{
     const c=countExercises(dia);
@@ -289,14 +303,19 @@ function openDay(di){
   const plan=PLAN_DATA.plan||{dias:[]};
   const dia=plan.dias[di];
   if(!dia) return;
-  document.getElementById('foldersView').style.display='none';
+  const fv=document.getElementById('foldersView');
   const dv=document.getElementById('dayView');
-  dv.style.display='';
+  fv.classList.add('view-exit');
+  setTimeout(()=>{
+    fv.style.display='none';fv.classList.remove('view-exit');
+    dv.style.display='';dv.classList.add('view-enter');
+    setTimeout(()=>dv.classList.remove('view-enter'),350);
+  },200);
   dv.innerHTML=`<button class="back-btn" id="backBtn">← Volver a días</button>
     <p class="tip">Tip: tocá el nombre del ejercicio para ver el video.</p>
     <div class="day-title">${esc(dia.nombre||'Día '+(di+1))}</div>
     <div>${renderDia(dia)}</div>`;
-  document.getElementById('backBtn').onclick=()=>{showFolders();window.scrollTo({top:0,behavior:'smooth'});};
+  document.getElementById('backBtn').onclick=()=>{showFolders(true);window.scrollTo({top:0,behavior:'smooth'});};
   wireExercises(dv);
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -318,8 +337,15 @@ function wireInfoFolder(){
   if(ifh) ifh.onclick=()=>{
     ifh.classList.toggle('open');
     const b=ifh.nextElementSibling;
-    b.classList.toggle('open');
-    if(b.classList.contains('open')) b.style.maxHeight=b.scrollHeight+'px'; else b.style.maxHeight='0';
+    if(b.classList.contains('open')){
+      b.style.maxHeight=b.scrollHeight+'px';
+      requestAnimationFrame(()=>{b.style.maxHeight='0';});
+      setTimeout(()=>b.classList.remove('open'),500);
+    }else{
+      b.classList.add('open');
+      b.style.maxHeight=b.scrollHeight+'px';
+      setTimeout(()=>{if(b.classList.contains('open'))b.style.maxHeight='none';},550);
+    }
   };
 }
 
