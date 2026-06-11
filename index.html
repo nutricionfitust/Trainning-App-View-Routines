@@ -251,6 +251,7 @@ document.getElementById('logoutBtn').onclick=()=>{
   document.getElementById('loginCard').style.display='';
   document.getElementById('passInput').value='';
   document.getElementById('loginErr').textContent='';
+  document.title='NFU Training App · Mi Plan de Entrenamiento';
   PLAN_DATA=null;
 };
 
@@ -260,6 +261,7 @@ function showRoutine(r){
   document.getElementById('routineCard').style.display='';
   document.getElementById('routineTitle').textContent=r.rutina_nombre||'Mi Plan de Entrenamiento';
   const apodo=extractApodo(r.rutina_nombre,r.alumno_nombre);
+  document.title='Mi Plan de Entrenamiento · '+apodo;
   document.getElementById('greeting').innerHTML=`<strong>¡Hola ${esc(apodo)}! 👋</strong>Este es tu plan de entrenamiento personalizado. Seleccioná el día para ver los ejercicios.<br>💪 ¡Vamos por esos objetivos!`;
   showFolders();
   buildPrintContent();
@@ -373,7 +375,7 @@ function formatReps(r){return r?esc(r.trim()).replace(/(\S+)\s+/g,'$1• '):'';}
 
 /* ========== MÁS INFORMACIÓN ========== */
 function renderMasInformacion(){
-  return `<div class="info-folder"><div class="info-folder-header"><span class="arrow">▶</span><div><h4>Más información</h4><p>Notas y recomendaciones</p></div></div><div class="info-folder-body"><div class="info-content">
+  return `<div class="info-folder"><div class="info-folder-header"><span class="arrow">▶</span><div><h4>Más información</h4><p>Notas útiles, explicaciones de RIR, aproximaciones y recomendaciones generales</p></div></div><div class="info-folder-body"><div class="info-content">
 <h5>Guía rápida: RIR, fallo, dropsets y más</h5>
 <p><strong>¿Qué significa RIR?</strong> Repeticiones En Reserva.</p>
 <p><strong>RIR 1:</strong> al terminar la serie sentís que podrías haber hecho 1 repetición más antes de llegar al fallo.</p>
